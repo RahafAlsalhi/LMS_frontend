@@ -4,9 +4,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AdminDashboard from "../dashboard/AdminDashboard/AdminDashboard";
 import AdminUserManagement from "./AdminUserManagement";
 import AdminCourseApproval from "./AdminCourseApproval";
+import GetAllUsers from "../dashboard/AdminDashboard/GetAllUsers";
 import adminAPI from "../../services/adminAPI";
 import { FullScreenLoader } from "@components/common/LoadingSpinner";
-
+import Catogery from "./Catogery"; // Match the actual component name
 // Protected Route wrapper with async auth check
 const ProtectedAdminRoute = ({ children }) => {
   const [authState, setAuthState] = useState({
@@ -68,6 +69,23 @@ const AdminRoutes = () => {
         }
       />
 
+      {/* Get All Users - This is the route you were trying to access */}
+      <Route
+        path="/GetAllUsers"
+        element={
+          <ProtectedAdminRoute>
+            <GetAllUsers />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/Catogery"
+        element={
+          <ProtectedAdminRoute>
+            <Catogery /> {/* Make sure component name matches import */}
+          </ProtectedAdminRoute>
+        }
+      />
       {/* Course Management */}
       <Route
         path="/courses"
@@ -78,11 +96,11 @@ const AdminRoutes = () => {
         }
       />
 
-      {/* Default redirect to dashboard */}
+      {/* Default redirect to dashboard - ONLY for exact /admin path */}
       <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
 
-      {/* Catch all - redirect to dashboard */}
-      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+      {/* Remove the catch-all redirect that was causing the issue */}
+      {/* <Route path="*" element={<Navigate to="/admin/dashboard" replace />} /> */}
     </Routes>
   );
 };

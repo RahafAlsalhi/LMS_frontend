@@ -232,11 +232,13 @@ class AdminAPIService {
       const [usersResult, coursesResult] = await Promise.all([
         this.getAllUsers(),
         this.getAllCourses(),
+        this.apiCall("/category/get"),
       ]);
 
       if (usersResult.success && coursesResult.success) {
         const users = usersResult.data;
         const courses = coursesResult.data;
+        const categories = categoriesResult.data;
 
         // Calculate statistics
         const stats = {
@@ -255,6 +257,7 @@ class AdminAPIService {
             (course) =>
               course.approval_status === "pending" || !course.approval_status
           ).length,
+          totalCategories: categories.length,
         };
 
         return {
@@ -269,7 +272,9 @@ class AdminAPIService {
               )
               .slice(0, 5), // Recent 5 pending courses
             stats,
+            categories: categories.slice(0, 8),
             allUsers: users,
+            allCategories: categories,
             allCourses: courses,
           },
         };

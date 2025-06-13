@@ -24,11 +24,14 @@ import Dashboard from "@pages/Dashboard/Dashboard";
 import StudentDashboard from "@components/dashboard/StudentDashboard";
 import InstructorDashboard from "@components/dashboard/InstructorDashboard";
 import AdminDashboard from "@components/dashboard/AdminDashboard";
-// Admin Management Components (these files need to be created)
+
+// Admin Management Components
 import AdminUserManagement from "@components/admin/AdminUserManagement";
 import AdminCourseApproval from "@components/admin/AdminCourseApproval";
-import AdminRoute from "@components/admin/AdminRoutes";
 import GetAllUsers from "./components/dashboard/AdminDashboard/GetAllUsers";
+
+// Import the nested AdminRoutes component
+import AdminRoutes from "@components/admin/AdminRoutes";
 
 const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID || "your-google-client-id";
@@ -63,49 +66,8 @@ function App() {
               />
               <Route path="/AdminDashboard" element={<AdminDashboard />} />
 
-              {/* 🆕 ADMIN MANAGEMENT ROUTES */}
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/users"
-                element={
-                  <AdminRoute>
-                    <AdminUserManagement />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/courses"
-                element={
-                  <AdminRoute>
-                    <AdminCourseApproval />
-                  </AdminRoute>
-                }
-              />
-
-              {/* Default admin redirect */}
-              <Route
-                path="/admin"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/GetAllUsers"
-                element={
-                  <AdminRoute>
-                    <GetAllUsers />
-                  </AdminRoute>
-                }
-              />
+              {/* 🆕 ADMIN MANAGEMENT ROUTES - Using nested routing */}
+              <Route path="/admin/*" element={<AdminRoutes />} />
 
               {/* 404 - Keep at bottom */}
               <Route path="*" element={<NotFound />} />
