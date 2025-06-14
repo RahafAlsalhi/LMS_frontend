@@ -66,7 +66,7 @@ function App() {
               />
               <Route path="/AdminDashboard" element={<AdminDashboard />} />
 
-              {/* 🆕 ADMIN MANAGEMENT ROUTES - Using nested routing */}
+              {/* ADMIN MANAGEMENT ROUTES - Using nested routing */}
               <Route path="/admin/*" element={<AdminRoutes />} />
 
               {/* 404 - Keep at bottom */}

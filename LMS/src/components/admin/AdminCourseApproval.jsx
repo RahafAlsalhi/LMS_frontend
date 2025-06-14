@@ -453,13 +453,6 @@ const AdminCourseApproval = () => {
                         spacing={1}
                         justifyContent="center"
                       >
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleViewCourse(course)}
-                        >
-                          <ViewIcon />
-                        </IconButton>
                         {(!course.approval_status ||
                           course.approval_status === "pending") && (
                           <>
