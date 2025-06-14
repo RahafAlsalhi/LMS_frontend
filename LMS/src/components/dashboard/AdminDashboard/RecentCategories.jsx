@@ -141,8 +141,10 @@ const RecentCategoriesComponent = ({ navigate }) => {
           <Box sx={{ p: 4, borderBottom: "1px solid #f5f5f5" }}>
             <Box
               display="flex"
+              flexDirection={{ xs: "column", sm: "row" }}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              gap={{ xs: 2, sm: 0 }}
             >
               <Box display="flex" alignItems="center" gap={3}>
                 <Box
@@ -173,24 +175,28 @@ const RecentCategoriesComponent = ({ navigate }) => {
                   </Typography>
                 </Box>
               </Box>
-              <Button
-                variant="outlined"
-                onClick={handleManageCategories}
-                sx={{
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1,
-                  borderColor: "#e5e7eb",
-                  color: "#059669",
-                  fontWeight: 500,
-                  "&:hover": {
-                    borderColor: "#059669",
-                    backgroundColor: "#f0fdfa",
-                  },
-                }}
-              >
-                Manage Categories ({totalCategoriesCount})
-              </Button>
+
+              <Box width={{ xs: "100%", sm: "auto" }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleManageCategories}
+                  sx={{
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1,
+                    borderColor: "#e5e7eb",
+                    color: "#059669",
+                    fontWeight: 500,
+                    "&:hover": {
+                      borderColor: "#059669",
+                      backgroundColor: "#f0fdfa",
+                    },
+                  }}
+                >
+                  Manage Categories ({totalCategoriesCount})
+                </Button>
+              </Box>
             </Box>
           </Box>
 
@@ -211,7 +217,11 @@ const RecentCategoriesComponent = ({ navigate }) => {
                         xs={12}
                         sm={6}
                         md={3}
+                        lg={3}
                         key={category.id || index}
+                        sx={{
+                          display: { xs: "none", sm: "block" },
+                        }}
                       >
                         <Box
                           sx={{

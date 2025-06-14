@@ -149,90 +149,114 @@ class AdminAPIService {
   async getUserById(userId) {
     return this.apiCall(`/users/get/${userId}`);
   }
+  // Get all courses (public) - matches GET /api/course/get
+  async getAllCourses(filters = {}) {
+    const queryParams = new URLSearchParams();
 
+    if (filters.search) queryParams.append("keyword", filters.search); // Your backend uses 'keyword'
+    if (filters.page) queryParams.append("page", filters.page);
+    if (filters.limit) queryParams.append("limit", filters.limit);
+
+    const query = queryParams.toString();
+    return this.apiCall(`/course/get${query ? `?${query}` : ""}`);
+  }
+
+  // Get all courses for admin - matches GET /api/course/admin/all
+  async getAllCoursesAdmin(filters = {}) {
+    const queryParams = new URLSearchParams();
+
+    if (filters.search) queryParams.append("keyword", filters.search);
+    if (filters.page) queryParams.append("page", filters.page);
+    if (filters.limit) queryParams.append("limit", filters.limit);
+
+    const query = queryParams.toString();
+    return this.apiCall(`/course/admin/all${query ? `?${query}` : ""}`);
+  }
+
+  // Get instructor's courses (you'll need to add this endpoint to backend)
+  async getInstructorCourses(instructorId = null) {
+    // For now, use getAllCourses and filter on frontend
+    // Later you can add GET /api/course/instructor/my to your backend
+    return this.getAllCourses();
+  }
+
+  // Create course - matches POST /api/course/create
+  async createCourse(courseData) {
+    // Match your backend's expected structure
+    return this.apiCall("/course/create", {
+      method: "POST",
+      data: {
+        title: courseData.title,
+        description: courseData.description,
+        thumbnail_url: courseData.thumbnail_url || null,
+        instructor_id: courseData.instructor_id, // Backend expects this
+        category_id: courseData.category_id,
+      },
+    });
+  }
+
+  // Update course - matches PUT /api/course/edit/:id
+  async updateCourse(courseId, courseData) {
+    return this.apiCall(`/course/edit/${courseId}`, {
+      method: "PUT",
+      data: {
+        id: courseId, // Your backend expects this in the body
+        title: courseData.title,
+        description: courseData.description,
+        thumbnail_url: courseData.thumbnail_url,
+        category_id: courseData.category_id,
+      },
+    });
+  }
+
+  // Delete course - matches DELETE /api/course/delete/:id
+  async deleteCourse(courseId) {
+    return this.apiCall(`/course/delete/${courseId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Get pending courses - matches GET /api/course/pending
   async getPendingCourses() {
     return this.apiCall("/course/pending");
   }
 
-  // Get all courses with admin details
-  async getAllCoursesAdmin() {
-    return this.apiCall("/course/admin/all");
-  }
-
-  // Approve a course
+  // Approve course - matches PATCH /api/course/:id/approve
   async approveCourse(courseId) {
     return this.apiCall(`/course/${courseId}/approve`, {
       method: "PATCH",
     });
   }
 
-  // Reject a course
+  // Reject course - matches PATCH /api/course/:id/reject
   async rejectCourse(courseId) {
     return this.apiCall(`/course/${courseId}/reject`, {
       method: "PATCH",
     });
   }
 
-  // Create course (for admin creating courses)
-  async createCourseAdmin(courseData) {
-    return this.apiCall("/course/create", {
-      method: "POST",
-      data: courseData,
-    });
+  // Search courses - matches GET /api/course/search
+  async searchCourses(query, filters = {}) {
+    const params = new URLSearchParams({ keyword: query }); // Your backend uses 'keyword'
+
+    return this.apiCall(`/course/search?${params.toString()}`);
   }
 
-  // Update course (admin can edit any course)
-  async updateCourseAdmin(courseId, courseData) {
-    return this.apiCall(`/course/edit/${courseId}`, {
-      method: "PUT",
-      data: courseData,
-    });
-  }
-
-  // Delete course (admin can delete any course)
-  async deleteCourseAdmin(courseId) {
-    return this.apiCall(`/course/delete/${courseId}`, {
-      method: "DELETE",
-    });
-  }
-
-  // Get course by ID with full details
-  async getCourseDetails(courseId) {
-    return this.apiCall(`/course/get/${courseId}`);
-  }
-
-  async getAllCourses() {
-    return this.apiCall("/course/get");
-  }
-
+  // Get course by ID - matches GET /api/course/get/:id
   async getCourseById(courseId) {
     return this.apiCall(`/course/get/${courseId}`);
   }
+  async getModulesByCourse(courseId) {
+    return this.apiCall(`/module/course/${courseId}`);
+  }
 
-  async createCourse(courseData) {
-    return this.apiCall("/courses/create", {
+  // Create a module
+  async createModule(moduleData) {
+    return this.apiCall("/module/create", {
       method: "POST",
-      data: courseData,
+      data: moduleData,
     });
   }
-
-  async updateCourse(courseId, courseData) {
-    return this.apiCall(`/courses/edit/${courseId}`, {
-      method: "PUT",
-      data: courseData,
-    });
-  }
-
-  async deleteCourse(courseId) {
-    return this.apiCall(`/courses/delete/${courseId}`, {
-      method: "DELETE",
-    });
-  }
-
-  async searchCourses(query) {
-    return this.apiCall(`/courses/search?q=${encodeURIComponent(query)}`);
-  }
-
   // ========================================
   // DASHBOARD DATA
   // ========================================
