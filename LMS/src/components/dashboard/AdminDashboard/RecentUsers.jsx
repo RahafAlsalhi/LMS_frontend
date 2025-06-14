@@ -120,8 +120,10 @@ const RecentUsersComponent = ({ navigate }) => {
           <Box sx={{ p: 4, borderBottom: "1px solid #f5f5f5" }}>
             <Box
               display="flex"
+              flexDirection={{ xs: "column", sm: "row" }}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              gap={{ xs: 2, sm: 0 }}
             >
               <Box display="flex" alignItems="center" gap={3}>
                 <Box
@@ -152,24 +154,28 @@ const RecentUsersComponent = ({ navigate }) => {
                   </Typography>
                 </Box>
               </Box>
-              <Button
-                variant="outlined"
-                onClick={handleViewAllUsers}
-                sx={{
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1,
-                  borderColor: "#e5e7eb",
-                  color: "#a855f7",
-                  fontWeight: 500,
-                  "&:hover": {
-                    borderColor: "#a855f7",
-                    backgroundColor: "#fef7ff",
-                  },
-                }}
-              >
-                View All Users ({totalUsersCount})
-              </Button>
+
+              <Box width={{ xs: "100%", sm: "auto" }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleViewAllUsers}
+                  sx={{
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1,
+                    borderColor: "#e5e7eb",
+                    color: "#a855f7",
+                    fontWeight: 500,
+                    "&:hover": {
+                      borderColor: "#a855f7",
+                      backgroundColor: "#fef7ff",
+                    },
+                  }}
+                >
+                  View All Users ({totalUsersCount})
+                </Button>
+              </Box>
             </Box>
           </Box>
 
@@ -189,6 +195,9 @@ const RecentUsersComponent = ({ navigate }) => {
                       md={6}
                       lg={3}
                       key={user.id || index}
+                      sx={{
+                        display: { xs: "none", sm: "block" },
+                      }}
                     >
                       <Box
                         sx={{

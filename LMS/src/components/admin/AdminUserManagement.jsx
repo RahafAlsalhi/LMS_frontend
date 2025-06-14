@@ -666,7 +666,16 @@ const AdminUserManagement = () => {
           )}
         </DialogActions>
       </Dialog>
-
+      {/* Back to Dashboard Button */}
+      <Box mt={4} display="flex" justifyContent="flex-start">
+        <Button
+          variant="outlined"
+          onClick={() => navigate("/admin/dashboard")}
+          sx={{ minWidth: 150 }}
+        >
+          ← Back to Dashboard
+        </Button>
+      </Box>
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}

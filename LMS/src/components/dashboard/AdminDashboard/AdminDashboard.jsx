@@ -54,6 +54,7 @@ import {
 } from "../../common/LoadingSpinner/LoadingSpinner";
 import RecentUsersComponent from "./RecentUsers";
 import RecentCategoriesComponent from "./RecentCategories";
+import CourseManagement from "@/components/courses/CourseManagement";
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -556,8 +557,10 @@ const AdminDashboard = () => {
             <Box sx={{ p: 4, borderBottom: "1px solid #f5f5f5" }}>
               <Box
                 display="flex"
+                flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                gap={2}
               >
                 <Box display="flex" alignItems="center" gap={3}>
                   <Box
@@ -898,6 +901,7 @@ const AdminDashboard = () => {
             </Box>
           </Paper>
         </Fade>
+
         {/* Categories Overview - Full Width */}
         <RecentCategoriesComponent navigate={navigate} />
 
