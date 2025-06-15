@@ -189,7 +189,7 @@ const CourseDetailsDialog = ({
                     Category
                   </Typography>
                   <Typography variant="body1">
-                    {course.category_name || "Uncategorized"}
+                    {course.category || "Uncategorized"}
                   </Typography>
                 </Box>
               </Box>

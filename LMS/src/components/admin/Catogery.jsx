@@ -293,8 +293,10 @@ const Category = () => {
           >
             <Box
               display="flex"
+              flexDirection={{ xs: "column", sm: "row" }}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              gap={3}
             >
               <Box>
                 <Box display="flex" alignItems="center" gap={3} mb={2}>
@@ -326,7 +328,12 @@ const Category = () => {
                   </Box>
                 </Box>
               </Box>
-              <Stack direction="row" spacing={2}>
+
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                width={{ xs: "100%", sm: "auto" }}
+              >
                 <Button
                   variant="outlined"
                   startIcon={
@@ -338,6 +345,7 @@ const Category = () => {
                   }
                   onClick={() => fetchCategories(true)}
                   disabled={refreshing}
+                  fullWidth
                   sx={{
                     borderRadius: 2,
                     px: 3,
@@ -357,6 +365,7 @@ const Category = () => {
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={handleOpenCreateDialog}
+                  fullWidth
                   sx={{
                     borderRadius: 2,
                     px: 4,

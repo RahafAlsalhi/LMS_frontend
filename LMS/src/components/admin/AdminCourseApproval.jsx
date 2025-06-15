@@ -169,9 +169,7 @@ const AdminCourseApproval = () => {
           course.description
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          course.category_name
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
+          course.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           course.instructor_name
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase())
@@ -375,7 +373,7 @@ const AdminCourseApproval = () => {
       </Box>
 
       {/* Debug Info - Remove this in production */}
-      <Paper sx={{ p: 2, mb: 3, bgcolor: "grey.100" }}>
+      {/* <Paper sx={{ p: 2, mb: 3, bgcolor: "grey.100" }}>
         <Typography variant="subtitle2" gutterBottom>
           Debug Info:
         </Typography>
@@ -390,7 +388,7 @@ const AdminCourseApproval = () => {
             {getCourseStatus(courses[0])}
           </Typography>
         )}
-      </Paper>
+      </Paper> */}
 
       {/* Statistics Cards */}
       <Grid container spacing={3} mb={4}>
@@ -524,7 +522,7 @@ const AdminCourseApproval = () => {
                     </TableCell>
                     <TableCell align="center">
                       <Chip
-                        label={course.category_name || "Uncategorized"}
+                        label={course.category || "Uncategorized"}
                         size="small"
                         variant="outlined"
                       />
@@ -575,14 +573,14 @@ const AdminCourseApproval = () => {
                             </IconButton>
                           </>
                         )}
-                        <IconButton
+                        {/* <IconButton
                           size="small"
                           color="primary"
                           onClick={() => handleViewCourse(course)}
                           title="View Details"
                         >
                           <ViewIcon />
-                        </IconButton>
+                        </IconButton> */}
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -662,7 +660,7 @@ const AdminCourseApproval = () => {
                         Category
                       </Typography>
                       <Typography variant="body1">
-                        {selectedCourse.category_name || "Uncategorized"}
+                        {selectedCourse.category || "Uncategorized"}
                       </Typography>
                     </Box>
                     <Box>

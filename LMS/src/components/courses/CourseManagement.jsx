@@ -702,9 +702,9 @@ const CourseManagement = ({
                     </Box>
                   )}
 
-                  {course.category_name && (
+                  {course.category && (
                     <Chip
-                      label={course.category_name}
+                      label={course.category}
                       size="small"
                       variant="outlined"
                       sx={{ mb: 1 }}

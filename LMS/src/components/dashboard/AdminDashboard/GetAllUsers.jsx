@@ -159,10 +159,13 @@ const GetAllUsers = () => {
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
       <Box mb={4}>
+        {/* Header: Title + Refresh Button */}
         <Box
           display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          gap={2}
           mb={2}
         >
           <Box>
@@ -178,7 +181,11 @@ const GetAllUsers = () => {
             startIcon={refreshing ? null : <RefreshIcon />}
             onClick={() => fetchUsers(true)}
             disabled={refreshing}
-            sx={{ minWidth: 120 }}
+            fullWidth={true}
+            sx={{
+              minWidth: { xs: "100%", sm: 120 },
+              alignSelf: { xs: "stretch", sm: "auto" },
+            }}
           >
             {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
