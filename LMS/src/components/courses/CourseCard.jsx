@@ -1,4 +1,3 @@
-// src/components/courses/CourseCard.jsx
 import React from "react";
 import {
   Card,
@@ -376,20 +375,7 @@ const CourseCard = ({
             />
           )}
 
-          {/* Rating (if available) */}
-          {course.average_rating && (
-            <Box display="flex" alignItems="center" gap={1}>
-              <Rating
-                value={course.average_rating}
-                precision={0.1}
-                size="small"
-                readOnly
-              />
-              <Typography variant="caption" color="text.secondary">
-                ({course.total_reviews || 0} reviews)
-              </Typography>
-            </Box>
-          )}
+      
 
           {/* Enrollment Count */}
           {course.total_enrollments !== undefined && (

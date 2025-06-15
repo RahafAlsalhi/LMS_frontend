@@ -27,7 +27,7 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
-import CreateCourseModal from "@/components/courses/CreateCourseModal";
+// import CreateCourseModal from "@/components/courses/CreateCourseModal";
 import {
   People as PeopleIcon,
   School as SchoolIcon,
@@ -57,7 +57,7 @@ import RecentUsersComponent from "./RecentUsers";
 import RecentCategoriesComponent from "./RecentCategories";
 import CourseManagement from "@/components/courses/CourseManagement";
 const AdminDashboard = () => {
-  const [createCourseModalOpen, setCreateCourseModalOpen] = useState(false);
+  // const [createCourseModalOpen, setCreateCourseModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const theme = useTheme();
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
     );
 
     // Close the modal
-    setCreateCourseModalOpen(false);
+    // setCreateCourseModalOpen(false);
   };
 
   // Statistics data for cards
@@ -622,7 +622,7 @@ const AdminDashboard = () => {
                   spacing={2}
                   width={{ xs: "100%", sm: "auto" }}
                 >
-                  <Button
+                  {/* <Button
                     fullWidth
                     variant="contained"
                     startIcon={<AddIcon />}
@@ -643,7 +643,7 @@ const AdminDashboard = () => {
                     }}
                   >
                     Create Course
-                  </Button>
+                  </Button> */}
                   <Button
                     fullWidth
                     variant="outlined"
@@ -796,11 +796,7 @@ const AdminDashboard = () => {
                           </TableCell>
                           <TableCell align="center">
                             <Chip
-                              label={
-                                course.category_name ||
-                                course.category ||
-                                "No Category"
-                              }
+                              label={course.category || "No Category"}
                               size="small"
                               sx={{
                                 backgroundColor: "#f3f4f6",
@@ -884,33 +880,9 @@ const AdminDashboard = () => {
                 </TableContainer>
               ) : (
                 <Box textAlign="center" py={8}>
-                  <Box
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: 3,
-                      backgroundColor: "#f9fafb",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mx: "auto",
-                      mb: 3,
-                    }}
-                  >
-                    <AssignmentIcon sx={{ fontSize: 32, color: "#9ca3af" }} />
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    color="#374151"
-                    mb={1}
-                    fontWeight={600}
-                  >
-                    No pending approvals
-                  </Typography>
-                  <Typography variant="body2" color="#6b7280" mb={3}>
-                    All courses have been reviewed and approved
-                  </Typography>
-                  <Button
+              
+
+                  {/* <Button
                     variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={() => setCreateCourseModalOpen(true)}
@@ -928,7 +900,7 @@ const AdminDashboard = () => {
                     }}
                   >
                     Create First Course
-                  </Button>
+                  </Button> */}
                 </Box>
               )}
             </Box>
@@ -1054,13 +1026,13 @@ const AdminDashboard = () => {
             {snackbar.message}
           </Alert>
         </Snackbar>
-        <CreateCourseModal
+        {/* <CreateCourseModal
           open={createCourseModalOpen}
           onClose={() => setCreateCourseModalOpen(false)}
           onCourseCreated={handleCourseCreated}
           instructorId={null}
           title="Create New Course"
-        />
+        /> */}
       </Container>
     </Box>
   );
