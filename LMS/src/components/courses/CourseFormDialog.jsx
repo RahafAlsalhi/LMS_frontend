@@ -244,16 +244,25 @@ const CourseFormDialog = ({
               <InputLabel>Category</InputLabel>
               <Select
                 value={formData.category_id}
-                onChange={(e) => handleChange("category_id", e.target.value)}
+                onChange={(e) =>
+                  handleChange(
+                    "category_id",
+                    e.target.value === "" ? null : parseInt(e.target.value)
+                  )
+                }
                 label="Category"
                 disabled={isReadOnly}
               >
+                <MenuItem value="" disabled>
+                  Select a category
+                </MenuItem>
                 {categories.map((category) => (
                   <MenuItem key={category.id} value={category.id}>
-                    {category.name}
+                    {course.category}
                   </MenuItem>
                 ))}
               </Select>
+
               {errors.category_id && (
                 <Typography
                   variant="caption"

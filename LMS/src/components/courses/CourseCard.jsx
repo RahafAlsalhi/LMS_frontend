@@ -347,9 +347,9 @@ const CourseCard = ({
           )}
 
           {/* Category */}
-          {course.category_name && (
+          {course.category && (
             <Chip
-              label={course.category_name}
+              label={course.category}
               size="small"
               variant="outlined"
               sx={{ width: "fit-content" }}

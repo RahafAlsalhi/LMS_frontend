@@ -314,8 +314,10 @@ const AdminUserManagement = () => {
       <Box mb={4}>
         <Box
           display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          gap={2}
           mb={2}
         >
           <Box>
@@ -330,6 +332,11 @@ const AdminUserManagement = () => {
             variant="contained"
             startIcon={<PersonAddIcon />}
             onClick={() => handleOpenDialog("create")}
+            fullWidth={false}
+            sx={{
+              width: { xs: "100%", sm: "auto" }, // Full width only on mobile
+              alignSelf: { xs: "stretch", sm: "center" }, // Center it vertically on large screens
+            }}
           >
             Add User
           </Button>
@@ -505,13 +512,6 @@ const AdminUserManagement = () => {
                         spacing={1}
                         justifyContent="center"
                       >
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleOpenDialog("view", user)}
-                        >
-                          <ViewIcon />
-                        </IconButton>
                         <IconButton
                           size="small"
                           color="warning"
