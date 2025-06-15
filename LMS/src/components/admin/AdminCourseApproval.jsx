@@ -75,7 +75,6 @@ const AdminCourseApproval = () => {
     total: 0,
   });
 
-  // ✅ SMART STATUS: Helper function to get course status
   const getCourseStatus = (course) => {
     console.log("🔍 Getting status for course:", {
       id: course.id,
@@ -86,13 +85,12 @@ const AdminCourseApproval = () => {
       updated_at: course.updated_at,
     });
 
-    // Check if course has been explicitly approved
+    // Check if course has been  approved
     if (course.is_approved === true || course.is_approved === 1) {
       return "approved";
     }
 
-    // Check if course has been explicitly rejected
-    // Try to determine if this is a rejected course vs a new pending course
+    // Check if course has been  rejected
     else if (course.is_approved === false || course.is_approved === 0) {
       // Strategy 1: Check if updated_at is significantly different from created_at
       // This suggests the course has been reviewed

@@ -31,7 +31,7 @@ import {
   Analytics as AnalyticsIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
+import CreateCourseModal from "@/components/courses/CreateCourseModal";
 const InstructorDashboard = () => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -154,8 +154,22 @@ const InstructorDashboard = () => {
             variant="contained"
             startIcon={<AddIcon />}
             size="large"
-            onClick={() => navigate("/courses/create")}
-            sx={{ px: 3, py: 1.5 }}
+            onClick={() => navigate("/instructor/courses/create")}
+            sx={{
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              background:
+                "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%)",
+              boxShadow: "0 10px 20px rgba(99, 102, 241, 0.3)",
+              "&:hover": {
+                background:
+                  "linear-gradient(135deg, #5b54f0 0%, #7c3aed 50%, #c333e8 100%)",
+                boxShadow: "0 15px 30px rgba(99, 102, 241, 0.4)",
+                transform: "translateY(-2px)",
+              },
+              transition: "all 0.3s ease-in-out",
+            }}
           >
             Create New Course
           </Button>
@@ -170,10 +184,13 @@ const InstructorDashboard = () => {
               sx={{
                 p: 3,
                 textAlign: "center",
+                borderRadius: 3,
+                border: "1px solid #f0f0f0",
                 transition: "all 0.3s ease",
                 "&:hover": {
                   transform: "translateY(-4px)",
-                  boxShadow: theme.shadows[8],
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  borderColor: `${stat.color}.200`,
                 },
               }}
             >
@@ -181,7 +198,7 @@ const InstructorDashboard = () => {
                 sx={{
                   width: 70,
                   height: 70,
-                  borderRadius: 2,
+                  borderRadius: 2.5,
                   backgroundColor: `${stat.color}.50`,
                   display: "flex",
                   alignItems: "center",
@@ -203,6 +220,7 @@ const InstructorDashboard = () => {
                 size="small"
                 color="success"
                 variant="outlined"
+                sx={{ borderRadius: 1.5 }}
               />
             </Card>
           </Grid>
@@ -212,7 +230,7 @@ const InstructorDashboard = () => {
       <Grid container spacing={4}>
         {/* My Courses */}
         <Grid item xs={12} lg={8}>
-          <Paper sx={{ p: 3, mb: 3 }}>
+          <Paper sx={{ p: 4, borderRadius: 3, border: "1px solid #f0f0f0" }}>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -225,7 +243,17 @@ const InstructorDashboard = () => {
               <Button
                 variant="outlined"
                 startIcon={<AddIcon />}
-                onClick={() => navigate("/courses/create")}
+                onClick={() => navigate("/instructor/courses/create")}
+                sx={{
+                  borderRadius: 2,
+                  borderColor: "#e5e7eb",
+                  color: "#6366f1",
+                  fontWeight: 500,
+                  "&:hover": {
+                    borderColor: "#6366f1",
+                    backgroundColor: "#f8faff",
+                  },
+                }}
               >
                 Create Course
               </Button>
@@ -235,20 +263,55 @@ const InstructorDashboard = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Course</TableCell>
-                    <TableCell align="center">Students</TableCell>
-                    <TableCell align="center">Status</TableCell>
-                    <TableCell align="center">Rating</TableCell>
-                    <TableCell align="center">Revenue</TableCell>
-                    <TableCell align="center">Actions</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: "#6b7280" }}>
+                      Course
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{ fontWeight: 600, color: "#6b7280" }}
+                    >
+                      Students
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{ fontWeight: 600, color: "#6b7280" }}
+                    >
+                      Status
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{ fontWeight: 600, color: "#6b7280" }}
+                    >
+                      Rating
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{ fontWeight: 600, color: "#6b7280" }}
+                    >
+                      Revenue
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{ fontWeight: 600, color: "#6b7280" }}
+                    >
+                      Actions
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {myCourses.map((course) => (
-                    <TableRow key={course.id} hover>
+                    <TableRow
+                      key={course.id}
+                      hover
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#f9fafb",
+                        },
+                      }}
+                    >
                       <TableCell>
                         <Box>
-                          <Typography variant="body1" fontWeight={600}>
+                          <Typography variant="body1" fontWeight={600} mb={0.5}>
                             {course.title}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
@@ -257,7 +320,7 @@ const InstructorDashboard = () => {
                         </Box>
                       </TableCell>
                       <TableCell align="center">
-                        <Typography variant="body2">
+                        <Typography variant="body2" fontWeight={500}>
                           {course.students}
                         </Typography>
                       </TableCell>
@@ -271,15 +334,20 @@ const InstructorDashboard = () => {
                               : "warning"
                           }
                           variant="outlined"
+                          sx={{ borderRadius: 1.5, fontWeight: 500 }}
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <Typography variant="body2">
-                          {course.rating > 0 ? course.rating : "N/A"}
+                        <Typography variant="body2" fontWeight={500}>
+                          {course.rating > 0 ? `⭐ ${course.rating}` : "N/A"}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography
+                          variant="body2"
+                          fontWeight={600}
+                          color="success.main"
+                        >
                           {course.revenue}
                         </Typography>
                       </TableCell>
@@ -292,24 +360,50 @@ const InstructorDashboard = () => {
                           <IconButton
                             size="small"
                             onClick={() => navigate(`/courses/${course.id}`)}
+                            sx={{
+                              backgroundColor: "#f0fdf4",
+                              color: "#16a34a",
+                              "&:hover": {
+                                backgroundColor: "#dcfce7",
+                                transform: "scale(1.05)",
+                              },
+                            }}
                           >
-                            <ViewIcon />
+                            <ViewIcon fontSize="small" />
                           </IconButton>
                           <IconButton
                             size="small"
                             onClick={() =>
-                              navigate(`/courses/${course.id}/edit`)
+                              navigate(`/instructor/courses/${course.id}/edit`)
                             }
+                            sx={{
+                              backgroundColor: "#fef3c7",
+                              color: "#d97706",
+                              "&:hover": {
+                                backgroundColor: "#fde68a",
+                                transform: "scale(1.05)",
+                              },
+                            }}
                           >
-                            <EditIcon />
+                            <EditIcon fontSize="small" />
                           </IconButton>
                           <IconButton
                             size="small"
                             onClick={() =>
-                              navigate(`/courses/${course.id}/analytics`)
+                              navigate(
+                                `/instructor/courses/${course.id}/analytics`
+                              )
                             }
+                            sx={{
+                              backgroundColor: "#f0f9ff",
+                              color: "#0284c7",
+                              "&:hover": {
+                                backgroundColor: "#e0f2fe",
+                                transform: "scale(1.05)",
+                              },
+                            }}
                           >
-                            <AnalyticsIcon />
+                            <AnalyticsIcon fontSize="small" />
                           </IconButton>
                         </Stack>
                       </TableCell>
@@ -323,7 +417,7 @@ const InstructorDashboard = () => {
 
         {/* Recent Students */}
         <Grid item xs={12} lg={4}>
-          <Paper sx={{ p: 3 }}>
+          <Paper sx={{ p: 4, borderRadius: 3, border: "1px solid #f0f0f0" }}>
             <Typography variant="h5" fontWeight={600} mb={3}>
               Recent Students
             </Typography>
@@ -336,20 +430,23 @@ const InstructorDashboard = () => {
                     display: "flex",
                     alignItems: "center",
                     gap: 2,
-                    p: 2,
-                    borderRadius: 2,
-                    backgroundColor: "grey.50",
+                    p: 2.5,
+                    borderRadius: 2.5,
+                    backgroundColor: "#f9fafb",
+                    border: "1px solid #f0f0f0",
                     transition: "all 0.2s ease",
                     "&:hover": {
-                      backgroundColor: "grey.100",
+                      backgroundColor: "#f3f4f6",
+                      transform: "translateY(-1px)",
                     },
                   }}
                 >
                   <Avatar
                     sx={{
-                      width: 40,
-                      height: 40,
+                      width: 44,
+                      height: 44,
                       backgroundColor: "primary.main",
+                      fontWeight: 600,
                     }}
                   >
                     {student.avatar}
@@ -362,11 +459,34 @@ const InstructorDashboard = () => {
                       variant="caption"
                       color="text.secondary"
                       display="block"
+                      mb={0.5}
                     >
                       {student.course}
                     </Typography>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Box
+                        sx={{
+                          width: 40,
+                          height: 4,
+                          backgroundColor: "#e5e7eb",
+                          borderRadius: 2,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: `${student.progress}%`,
+                            height: "100%",
+                            backgroundColor: "#10b981",
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {student.progress}%
+                      </Typography>
+                    </Box>
                     <Typography variant="caption" color="text.secondary">
-                      Progress: {student.progress}% • {student.lastActive}
+                      {student.lastActive}
                     </Typography>
                   </Box>
                 </Box>
@@ -376,8 +496,16 @@ const InstructorDashboard = () => {
             <Button
               variant="text"
               fullWidth
-              sx={{ mt: 2 }}
-              onClick={() => navigate("/students")}
+              sx={{
+                mt: 3,
+                borderRadius: 2,
+                color: "#6366f1",
+                fontWeight: 500,
+                "&:hover": {
+                  backgroundColor: "#f8faff",
+                },
+              }}
+              onClick={() => navigate("/instructor/students")}
             >
               View All Students
             </Button>
@@ -386,18 +514,30 @@ const InstructorDashboard = () => {
       </Grid>
 
       {/* Quick Actions */}
-      <Paper sx={{ p: 3, mt: 4 }}>
+      <Paper sx={{ p: 4, mt: 4, borderRadius: 3, border: "1px solid #f0f0f0" }}>
         <Typography variant="h5" fontWeight={600} mb={3}>
           Quick Actions
         </Typography>
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
             <Button
               variant="outlined"
               fullWidth
               startIcon={<AddIcon />}
-              onClick={() => navigate("/courses/create")}
-              sx={{ py: 2 }}
+              onClick={() => navigate("/instructor/courses/create")}
+              sx={{
+                py: 2.5,
+                borderRadius: 2.5,
+                borderColor: "#e5e7eb",
+                color: "#6366f1",
+                fontWeight: 600,
+                "&:hover": {
+                  borderColor: "#6366f1",
+                  backgroundColor: "#f8faff",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.2s ease",
+              }}
             >
               Create Course
             </Button>
@@ -407,8 +547,20 @@ const InstructorDashboard = () => {
               variant="outlined"
               fullWidth
               startIcon={<AssignmentIcon />}
-              onClick={() => navigate("/assignments")}
-              sx={{ py: 2 }}
+              onClick={() => navigate("/instructor/assignments")}
+              sx={{
+                py: 2.5,
+                borderRadius: 2.5,
+                borderColor: "#e5e7eb",
+                color: "#059669",
+                fontWeight: 600,
+                "&:hover": {
+                  borderColor: "#059669",
+                  backgroundColor: "#f0fdf4",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.2s ease",
+              }}
             >
               Manage Assignments
             </Button>
@@ -418,8 +570,20 @@ const InstructorDashboard = () => {
               variant="outlined"
               fullWidth
               startIcon={<PeopleIcon />}
-              onClick={() => navigate("/students")}
-              sx={{ py: 2 }}
+              onClick={() => navigate("/instructor/students")}
+              sx={{
+                py: 2.5,
+                borderRadius: 2.5,
+                borderColor: "#e5e7eb",
+                color: "#dc2626",
+                fontWeight: 600,
+                "&:hover": {
+                  borderColor: "#dc2626",
+                  backgroundColor: "#fef2f2",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.2s ease",
+              }}
             >
               View Students
             </Button>
@@ -429,8 +593,20 @@ const InstructorDashboard = () => {
               variant="outlined"
               fullWidth
               startIcon={<AnalyticsIcon />}
-              onClick={() => navigate("/analytics")}
-              sx={{ py: 2 }}
+              onClick={() => navigate("/instructor/analytics")}
+              sx={{
+                py: 2.5,
+                borderRadius: 2.5,
+                borderColor: "#e5e7eb",
+                color: "#0284c7",
+                fontWeight: 600,
+                "&:hover": {
+                  borderColor: "#0284c7",
+                  backgroundColor: "#f0f9ff",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.2s ease",
+              }}
             >
               View Analytics
             </Button>
