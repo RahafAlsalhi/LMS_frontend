@@ -1,4 +1,4 @@
-// src/services/adminAPI.js - Cookie-based with axios
+// src/services/adminAPI.js - Fixed version
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -113,7 +113,7 @@ class AdminAPIService {
   }
 
   // ========================================
-  // APIs
+  // USER APIs
   // ========================================
 
   async getAllUsers() {
@@ -149,20 +149,13 @@ class AdminAPIService {
   async getUserById(userId) {
     return this.apiCall(`/users/get/${userId}`);
   }
-  // Get all courses (public) - matches GET /api/course/get
-  async getAllCourses(filters = {}) {
-    const queryParams = new URLSearchParams();
 
-    if (filters.search) queryParams.append("keyword", filters.search); // Your backend uses 'keyword'
-    if (filters.page) queryParams.append("page", filters.page);
-    if (filters.limit) queryParams.append("limit", filters.limit);
+  // ========================================
+  // COURSE APIs - FIXED
+  // ========================================
 
-    const query = queryParams.toString();
-    return this.apiCall(`/course/get${query ? `?${query}` : ""}`);
-  }
-
-  // Get all courses for admin - matches GET /api/course/admin/all
-  async getAllCoursesAdmin(filters = {}) {
+  // ❌ OLD: Get all courses (public) - only published courses
+  async getAllCoursesPublic(filters = {}) {
     const queryParams = new URLSearchParams();
 
     if (filters.search) queryParams.append("keyword", filters.search);
@@ -170,10 +163,38 @@ class AdminAPIService {
     if (filters.limit) queryParams.append("limit", filters.limit);
 
     const query = queryParams.toString();
-    return this.apiCall(`/course/admin/all${query ? `?${query}` : ""}`);
+    return this.apiCall(`/course/get${query ? `?${query}` : ""}`);
   }
 
-  // Get instructor's courses (you'll need to add this endpoint to backend)
+  // ✅ FIXED: Get all courses for admin - includes ALL courses (pending + approved)
+  async getAllCourses(filters = {}) {
+    console.log("🔍 AdminAPI: Getting ALL courses for admin...");
+
+    const queryParams = new URLSearchParams();
+    if (filters.search) queryParams.append("keyword", filters.search);
+    if (filters.page) queryParams.append("page", filters.page);
+    if (filters.limit) queryParams.append("limit", filters.limit);
+
+    const query = queryParams.toString();
+    const result = await this.apiCall(
+      `/course/admin/all${query ? `?${query}` : ""}`
+    );
+
+    console.log("🔍 AdminAPI: Received courses:", result.data?.length);
+    console.log("🔍 AdminAPI: Status breakdown:", {
+      pending: result.data?.filter((c) => c.is_approved === false).length,
+      approved: result.data?.filter((c) => c.is_approved === true).length,
+    });
+
+    return result;
+  }
+
+  // Keep the old method name for backward compatibility
+  async getAllCoursesAdmin(filters = {}) {
+    return this.getAllCourses(filters);
+  }
+
+  // Get instructor's courses
   async getInstructorCourses(instructorId = null) {
     // For now, use getAllCourses and filter on frontend
     // Later you can add GET /api/course/instructor/my to your backend
@@ -182,17 +203,21 @@ class AdminAPIService {
 
   // Create course - matches POST /api/course/create
   async createCourse(courseData) {
-    // Match your backend's expected structure
-    return this.apiCall("/course/create", {
+    console.log("🔍 AdminAPI: Creating course:", courseData);
+
+    const result = await this.apiCall("/course/create", {
       method: "POST",
       data: {
         title: courseData.title,
         description: courseData.description,
         thumbnail_url: courseData.thumbnail_url || null,
-        instructor_id: courseData.instructor_id, // Backend expects this
+        instructor_id: courseData.instructor_id,
         category_id: courseData.category_id,
       },
     });
+
+    console.log("🔍 AdminAPI: Course created:", result);
+    return result;
   }
 
   // Update course - matches PUT /api/course/edit/:id
@@ -200,7 +225,7 @@ class AdminAPIService {
     return this.apiCall(`/course/edit/${courseId}`, {
       method: "PUT",
       data: {
-        id: courseId, // Your backend expects this in the body
+        id: courseId,
         title: courseData.title,
         description: courseData.description,
         thumbnail_url: courseData.thumbnail_url,
@@ -218,27 +243,41 @@ class AdminAPIService {
 
   // Get pending courses - matches GET /api/course/pending
   async getPendingCourses() {
-    return this.apiCall("/course/pending");
+    console.log("🔍 AdminAPI: Getting pending courses...");
+
+    const result = await this.apiCall("/course/pending");
+
+    console.log("🔍 AdminAPI: Pending courses:", result.data?.length);
+    return result;
   }
 
   // Approve course - matches PATCH /api/course/:id/approve
   async approveCourse(courseId) {
-    return this.apiCall(`/course/${courseId}/approve`, {
+    console.log("🔍 AdminAPI: Approving course:", courseId);
+
+    const result = await this.apiCall(`/course/${courseId}/approve`, {
       method: "PATCH",
     });
+
+    console.log("🔍 AdminAPI: Approval result:", result);
+    return result;
   }
 
   // Reject course - matches PATCH /api/course/:id/reject
   async rejectCourse(courseId) {
-    return this.apiCall(`/course/${courseId}/reject`, {
+    console.log("🔍 AdminAPI: Rejecting course:", courseId);
+
+    const result = await this.apiCall(`/course/${courseId}/reject`, {
       method: "PATCH",
     });
+
+    console.log("🔍 AdminAPI: Rejection result:", result);
+    return result;
   }
 
   // Search courses - matches GET /api/course/search
   async searchCourses(query, filters = {}) {
-    const params = new URLSearchParams({ keyword: query }); // Your backend uses 'keyword'
-
+    const params = new URLSearchParams({ keyword: query });
     return this.apiCall(`/course/search?${params.toString()}`);
   }
 
@@ -246,26 +285,31 @@ class AdminAPIService {
   async getCourseById(courseId) {
     return this.apiCall(`/course/get/${courseId}`);
   }
+
+  // ========================================
+  // MODULE APIs
+  // ========================================
+
   async getModulesByCourse(courseId) {
     return this.apiCall(`/module/course/${courseId}`);
   }
 
-  // Create a module
   async createModule(moduleData) {
     return this.apiCall("/module/create", {
       method: "POST",
       data: moduleData,
     });
   }
+
   // ========================================
-  // DASHBOARD DATA
+  // DASHBOARD DATA - UPDATED
   // ========================================
 
   async getDashboardData() {
     try {
       console.log("📊 Fetching dashboard data...");
 
-      // Fetch all data in parallel for better performance
+      // ✅ FIXED: Use getAllCourses (admin endpoint) instead of getAllCoursesPublic
       const [
         usersResult,
         coursesResult,
@@ -273,7 +317,7 @@ class AdminAPIService {
         pendingCoursesResult,
       ] = await Promise.all([
         this.getAllUsers(),
-        this.getAllCourses(),
+        this.getAllCourses(), // ✅ Now gets ALL courses, not just published
         this.apiCall("/category/get"),
         this.getPendingCourses(),
       ]);
@@ -302,7 +346,7 @@ class AdminAPIService {
           ? pendingCoursesResult.data
           : [];
 
-        // Calculate real statistics
+        // ✅ FIXED: Calculate statistics using is_approved field
         const stats = {
           // User statistics
           totalUsers: users.length,
@@ -316,19 +360,16 @@ class AdminAPIService {
             (user) => user.role === "admin" || user.role === "ADMIN"
           ).length,
 
-          // Course statistics
+          // Course statistics - FIXED
           totalCourses: courses.length,
-          activeCourses: courses.filter(
-            (course) =>
-              course.approval_status === "approved" ||
-              course.status === "active" ||
-              course.is_active === true
+          activeCourses: courses.filter((course) => course.is_approved === true)
+            .length,
+          pendingApprovals: courses.filter(
+            (course) => course.is_approved === false
           ).length,
-          pendingApprovals: pendingCourses.length,
           rejectedCourses: courses.filter(
             (course) =>
-              course.approval_status === "rejected" ||
-              course.approval_status === "REJECTED"
+              course.is_approved === false && course.is_published === false
           ).length,
 
           // Category statistics
@@ -404,7 +445,7 @@ class AdminAPIService {
             allUsers: users,
             allCourses: courses,
             allCategories: categories,
-            allPendingCourses: pendingCourses, // Add this
+            allPendingCourses: pendingCourses,
           },
           message: "Dashboard data fetched successfully",
         };
@@ -441,11 +482,11 @@ class AdminAPIService {
       };
     }
   }
+
   // ========================================
   // AUTHENTICATION & USER INFO
   // ========================================
 
-  // Get current user from your auth API
   async getCurrentUser() {
     try {
       console.log("👤 Getting current user...");
@@ -465,7 +506,6 @@ class AdminAPIService {
     }
   }
 
-  // Check if user is authenticated and is admin
   async isAdminAuthenticated() {
     try {
       // First check if we have user data in localStorage
@@ -492,7 +532,6 @@ class AdminAPIService {
     }
   }
 
-  // Logout user (using your auth service pattern)
   async logout() {
     try {
       console.log("Attempting logout...");
@@ -520,7 +559,6 @@ class AdminAPIService {
   // UTILITY METHODS
   // ========================================
 
-  // Format currency
   formatCurrency(amount) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -528,7 +566,6 @@ class AdminAPIService {
     }).format(amount || 0);
   }
 
-  // Format date
   formatDate(dateString) {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -538,7 +575,6 @@ class AdminAPIService {
     });
   }
 
-  // Get role color for UI
   getRoleColor(role) {
     switch (role) {
       case "admin":
@@ -551,7 +587,6 @@ class AdminAPIService {
     }
   }
 
-  // Get status color for courses
   getStatusColor(status) {
     switch (status) {
       case "approved":
@@ -566,7 +601,6 @@ class AdminAPIService {
     }
   }
 
-  // Test admin API connection
   async testAdminConnection() {
     try {
       console.log(" Testing admin API connection...");

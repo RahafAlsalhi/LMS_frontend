@@ -27,6 +27,7 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
+import CreateCourseModal from "@/components/courses/CreateCourseModal";
 import {
   People as PeopleIcon,
   School as SchoolIcon,
@@ -56,6 +57,8 @@ import RecentUsersComponent from "./RecentUsers";
 import RecentCategoriesComponent from "./RecentCategories";
 import CourseManagement from "@/components/courses/CourseManagement";
 const AdminDashboard = () => {
+  const [createCourseModalOpen, setCreateCourseModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -168,6 +171,29 @@ const AdminDashboard = () => {
     } finally {
       setActionLoading(null);
     }
+  };
+  const handleCourseCreated = (newCourse) => {
+    console.log("New course created:", newCourse);
+
+    // Add the new course to pending approvals
+    setDashboardData((prev) => ({
+      ...prev,
+      courses: [newCourse, ...prev.courses],
+      stats: {
+        ...prev.stats,
+        pendingApprovals: prev.stats.pendingApprovals + 1,
+        totalCourses: prev.stats.totalCourses + 1,
+      },
+    }));
+
+    // Show success message
+    showSnackbar(
+      "Course created successfully! It's now pending approval.",
+      "success"
+    );
+
+    // Close the modal
+    setCreateCourseModalOpen(false);
   };
 
   // Statistics data for cards
@@ -599,14 +625,20 @@ const AdminDashboard = () => {
                   <Button
                     fullWidth
                     variant="contained"
-                    onClick={() => navigate("/admin/courses/create")}
+                    startIcon={<AddIcon />}
+                    onClick={() => setCreateCourseModalOpen(true)}
                     sx={{
                       borderRadius: 2,
                       px: 3,
                       py: 1,
-                      backgroundColor: "#4f46e5",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
                       "&:hover": {
-                        backgroundColor: "#4338ca",
+                        background:
+                          "linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)",
+                        boxShadow: "0 6px 16px rgba(102, 126, 234, 0.5)",
+                        transform: "translateY(-1px)",
                       },
                     }}
                   >
@@ -880,7 +912,8 @@ const AdminDashboard = () => {
                   </Typography>
                   <Button
                     variant="outlined"
-                    onClick={() => navigate("/admin/courses/create")}
+                    startIcon={<AddIcon />}
+                    onClick={() => setCreateCourseModalOpen(true)}
                     sx={{
                       borderRadius: 2,
                       px: 3,
@@ -1021,6 +1054,13 @@ const AdminDashboard = () => {
             {snackbar.message}
           </Alert>
         </Snackbar>
+        <CreateCourseModal
+          open={createCourseModalOpen}
+          onClose={() => setCreateCourseModalOpen(false)}
+          onCourseCreated={handleCourseCreated}
+          instructorId={null}
+          title="Create New Course"
+        />
       </Container>
     </Box>
   );

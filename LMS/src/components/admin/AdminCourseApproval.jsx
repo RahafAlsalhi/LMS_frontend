@@ -75,6 +75,50 @@ const AdminCourseApproval = () => {
     total: 0,
   });
 
+  // ✅ SMART STATUS: Helper function to get course status
+  const getCourseStatus = (course) => {
+    console.log("🔍 Getting status for course:", {
+      id: course.id,
+      title: course.title,
+      is_approved: course.is_approved,
+      is_published: course.is_published,
+      created_at: course.created_at,
+      updated_at: course.updated_at,
+    });
+
+    // Check if course has been explicitly approved
+    if (course.is_approved === true || course.is_approved === 1) {
+      return "approved";
+    }
+
+    // Check if course has been explicitly rejected
+    // Try to determine if this is a rejected course vs a new pending course
+    else if (course.is_approved === false || course.is_approved === 0) {
+      // Strategy 1: Check if updated_at is significantly different from created_at
+      // This suggests the course has been reviewed
+      const createdTime = new Date(course.created_at).getTime();
+      const updatedTime = new Date(course.updated_at).getTime();
+      const timeDifference = updatedTime - createdTime;
+
+      // If updated more than 10 seconds after creation, likely it was reviewed and rejected
+      if (timeDifference > 10000) {
+        return "rejected";
+      }
+
+      // Strategy 2: Check if other courses have been approved/rejected
+      // If this is the only course with false, it might be newly created
+      // (This is not perfect but a temporary workaround)
+
+      // For now, default to pending for recently created courses
+      return "pending";
+    }
+
+    // null, undefined, or any other value - consider pending
+    else {
+      return "pending";
+    }
+  };
+
   // Check authentication and fetch data
   useEffect(() => {
     if (!adminAPI.isAdminAuthenticated()) {
@@ -84,31 +128,31 @@ const AdminCourseApproval = () => {
     fetchCourses();
   }, [navigate]);
 
-  // Filter courses based on tab and search
+  // ✅ SIMPLIFIED: Filter courses based on tab and search
   useEffect(() => {
+    console.log("🔍 Filtering courses:", {
+      totalCourses: courses.length,
+      tabValue,
+      searchTerm,
+    });
+
     let filtered = [...courses];
 
     // Tab filter
     switch (tabValue) {
       case 0: // Pending
         filtered = filtered.filter(
-          (course) =>
-            course.approval_status === "pending" ||
-            !course.approval_status ||
-            !course.is_approved
+          (course) => getCourseStatus(course) === "pending"
         );
         break;
       case 1: // Approved
         filtered = filtered.filter(
-          (course) =>
-            course.approval_status === "approved" || course.is_approved === true
+          (course) => getCourseStatus(course) === "approved"
         );
         break;
       case 2: // Rejected
         filtered = filtered.filter(
-          (course) =>
-            course.approval_status === "rejected" ||
-            (course.is_approved === false && course.is_published === false)
+          (course) => getCourseStatus(course) === "rejected"
         );
         break;
       case 3: // All
@@ -125,56 +169,78 @@ const AdminCourseApproval = () => {
           course.description
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          course.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          course.category_name
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
           course.instructor_name
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase())
       );
     }
 
+    console.log("🔍 Filtered courses:", filtered.length);
     setFilteredCourses(filtered);
     setCurrentPage(1); // Reset to first page when filters change
   }, [courses, tabValue, searchTerm]);
 
-  // Fetch all courses
+  // ✅ SIMPLIFIED: Fetch all courses
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const result = await adminAPI.getAllCourses();
+      console.log("🔍 Fetching courses...");
 
-      if (result.success) {
+      const result = await adminAPI.getAllCoursesAdmin();
+      console.log("🔍 API Response:", result);
+
+      if (result && result.success && Array.isArray(result.data)) {
+        console.log("🔍 Setting courses:", result.data.length);
+
+        // Log each course for debugging
+        result.data.forEach((course) => {
+          console.log("Course:", {
+            id: course.id,
+            title: course.title,
+            is_approved: course.is_approved,
+            status: getCourseStatus(course),
+          });
+        });
+
         setCourses(result.data);
         calculateStats(result.data);
       } else {
+        console.error("🔍 Invalid response:", result);
         showSnackbar("Failed to fetch courses", "error");
+        setCourses([]); // Set empty array on error
       }
     } catch (error) {
       console.error("Error fetching courses:", error);
       showSnackbar("Error fetching courses", "error");
+      setCourses([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ SIMPLIFIED: Calculate stats
   const calculateStats = (coursesData) => {
+    const pendingCount = coursesData.filter(
+      (course) => getCourseStatus(course) === "pending"
+    ).length;
+    const approvedCount = coursesData.filter(
+      (course) => getCourseStatus(course) === "approved"
+    ).length;
+    const rejectedCount = coursesData.filter(
+      (course) => getCourseStatus(course) === "rejected"
+    ).length;
+
     const stats = {
-      pending: coursesData.filter(
-        (course) =>
-          course.approval_status === "pending" ||
-          !course.approval_status ||
-          !course.is_approved // Handle both approval_status and is_approved
-      ).length,
-      approved: coursesData.filter(
-        (course) =>
-          course.approval_status === "approved" || course.is_approved === true
-      ).length,
-      rejected: coursesData.filter(
-        (course) =>
-          course.approval_status === "rejected" ||
-          (course.is_approved === false && course.is_published === false)
-      ).length,
+      pending: pendingCount,
+      approved: approvedCount,
+      rejected: rejectedCount,
       total: coursesData.length,
     };
+
+    console.log("🔍 Calculated stats:", stats);
     setStats(stats);
   };
 
@@ -198,15 +264,18 @@ const AdminCourseApproval = () => {
 
     try {
       setActionLoading(true);
+      console.log(`🔍 ${actionText}ing course:`, courseId);
 
       if (action === "approve") {
-        await adminAPI.approveCourse(courseId);
+        const result = await adminAPI.approveCourse(courseId);
+        console.log("🔍 Approval result:", result);
       } else {
-        await adminAPI.rejectCourse(courseId);
+        const result = await adminAPI.rejectCourse(courseId);
+        console.log("🔍 Rejection result:", result);
       }
 
       showSnackbar(`Course ${actionText}d successfully!`);
-      fetchCourses();
+      await fetchCourses(); // Refresh courses list
     } catch (error) {
       console.error(`Error ${actionText}ing course:`, error);
       showSnackbar(`Error ${actionText}ing course`, "error");
@@ -234,7 +303,9 @@ const AdminCourseApproval = () => {
 
   const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
 
-  const getStatusColor = (status) => {
+  // Status functions
+  const getStatusColor = (course) => {
+    const status = getCourseStatus(course);
     switch (status) {
       case "approved":
         return "success";
@@ -246,7 +317,8 @@ const AdminCourseApproval = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (course) => {
+    const status = getCourseStatus(course);
     switch (status) {
       case "approved":
         return <ApproveIcon />;
@@ -258,9 +330,15 @@ const AdminCourseApproval = () => {
     }
   };
 
-  const getStatusText = (status) => {
-    if (!status || status === "pending") return "PENDING";
+  const getStatusText = (course) => {
+    const status = getCourseStatus(course);
     return status.toUpperCase();
+  };
+
+  // Check if course can be acted upon
+  const canActOnCourse = (course) => {
+    const status = getCourseStatus(course);
+    return status === "pending";
   };
 
   if (loading) {
@@ -295,6 +373,24 @@ const AdminCourseApproval = () => {
           </Button>
         </Box>
       </Box>
+
+      {/* Debug Info - Remove this in production */}
+      <Paper sx={{ p: 2, mb: 3, bgcolor: "grey.100" }}>
+        <Typography variant="subtitle2" gutterBottom>
+          Debug Info:
+        </Typography>
+        <Typography variant="body2">
+          Total Courses: {courses.length} | Filtered Courses:{" "}
+          {filteredCourses.length} | Current Tab: {tabValue} | Search: "
+          {searchTerm}"
+        </Typography>
+        {courses.length > 0 && (
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Sample Course Status: {courses[0]?.title} -{" "}
+            {getCourseStatus(courses[0])}
+          </Typography>
+        )}
+      </Paper>
 
       {/* Statistics Cards */}
       <Grid container spacing={3} mb={4}>
@@ -428,16 +524,16 @@ const AdminCourseApproval = () => {
                     </TableCell>
                     <TableCell align="center">
                       <Chip
-                        label={course.category || "Uncategorized"}
+                        label={course.category_name || "Uncategorized"}
                         size="small"
                         variant="outlined"
                       />
                     </TableCell>
                     <TableCell align="center">
                       <Chip
-                        icon={getStatusIcon(course.approval_status)}
-                        label={getStatusText(course.approval_status)}
-                        color={getStatusColor(course.approval_status)}
+                        icon={getStatusIcon(course)}
+                        label={getStatusText(course)}
+                        color={getStatusColor(course)}
                         variant="outlined"
                         size="small"
                       />
@@ -453,8 +549,7 @@ const AdminCourseApproval = () => {
                         spacing={1}
                         justifyContent="center"
                       >
-                        {(!course.approval_status ||
-                          course.approval_status === "pending") && (
+                        {canActOnCourse(course) && (
                           <>
                             <IconButton
                               size="small"
@@ -463,6 +558,7 @@ const AdminCourseApproval = () => {
                                 handleCourseAction(course.id, "approve")
                               }
                               disabled={actionLoading}
+                              title="Approve Course"
                             >
                               <ApproveIcon />
                             </IconButton>
@@ -473,11 +569,20 @@ const AdminCourseApproval = () => {
                                 handleCourseAction(course.id, "reject")
                               }
                               disabled={actionLoading}
+                              title="Reject Course"
                             >
                               <RejectIcon />
                             </IconButton>
                           </>
                         )}
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleViewCourse(course)}
+                          title="View Details"
+                        >
+                          <ViewIcon />
+                        </IconButton>
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -504,6 +609,11 @@ const AdminCourseApproval = () => {
             <Typography variant="h6" color="text.secondary">
               No courses found for the selected filter.
             </Typography>
+            {courses.length === 0 && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                No courses have been submitted yet.
+              </Typography>
+            )}
           </Box>
         )}
       </Paper>
@@ -523,9 +633,9 @@ const AdminCourseApproval = () => {
                 <Box>
                   <Typography variant="h6">{selectedCourse.title}</Typography>
                   <Chip
-                    icon={getStatusIcon(selectedCourse.approval_status)}
-                    label={getStatusText(selectedCourse.approval_status)}
-                    color={getStatusColor(selectedCourse.approval_status)}
+                    icon={getStatusIcon(selectedCourse)}
+                    label={getStatusText(selectedCourse)}
+                    color={getStatusColor(selectedCourse)}
                     size="small"
                   />
                 </Box>
@@ -552,10 +662,9 @@ const AdminCourseApproval = () => {
                         Category
                       </Typography>
                       <Typography variant="body1">
-                        {selectedCourse.category || "Uncategorized"}
+                        {selectedCourse.category_name || "Uncategorized"}
                       </Typography>
                     </Box>
-
                     <Box>
                       <Typography variant="body2" color="text.secondary">
                         Duration
@@ -587,16 +696,6 @@ const AdminCourseApproval = () => {
                         {adminAPI.formatDate(selectedCourse.created_at)}
                       </Typography>
                     </Box>
-                    {selectedCourse.approved_at && (
-                      <Box>
-                        <Typography variant="body2" color="text.secondary">
-                          Approved Date
-                        </Typography>
-                        <Typography variant="body1">
-                          {adminAPI.formatDate(selectedCourse.approved_at)}
-                        </Typography>
-                      </Box>
-                    )}
                     <Box>
                       <Typography variant="body2" color="text.secondary">
                         Last Updated
@@ -607,34 +706,13 @@ const AdminCourseApproval = () => {
                     </Box>
                   </Stack>
                 </Grid>
-                {selectedCourse.learning_objectives && (
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Learning Objectives
-                    </Typography>
-                    <Typography variant="body1">
-                      {selectedCourse.learning_objectives}
-                    </Typography>
-                  </Grid>
-                )}
-                {selectedCourse.prerequisites && (
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Prerequisites
-                    </Typography>
-                    <Typography variant="body1">
-                      {selectedCourse.prerequisites}
-                    </Typography>
-                  </Grid>
-                )}
               </Grid>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseDialog} disabled={actionLoading}>
                 Close
               </Button>
-              {(!selectedCourse.approval_status ||
-                selectedCourse.approval_status === "pending") && (
+              {canActOnCourse(selectedCourse) && (
                 <>
                   <Button
                     variant="contained"
@@ -678,6 +756,7 @@ const AdminCourseApproval = () => {
           </>
         )}
       </Dialog>
+
       {/* Back to Dashboard Button */}
       <Box mt={4} display="flex" justifyContent="flex-start">
         <Button
@@ -688,6 +767,7 @@ const AdminCourseApproval = () => {
           ← Back to Dashboard
         </Button>
       </Box>
+
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
